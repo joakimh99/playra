@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { FilterBar } from './components/FilterBar';
 import { MonthView } from './components/MonthView';
 import { SourceBanner } from './components/SourceBanner';
+import { SportChips } from './components/SportChips';
 import { WeekView } from './components/WeekView';
 import { useSchedule } from './hooks/useSchedule';
 import { formatRangeLabel, shiftAnchor, zonedNow } from './lib/dates';
@@ -15,7 +16,7 @@ function App() {
   const [anchor, setAnchor] = useState(() => zonedNow());
   const [filters, setFilters] = useState<FilterState>(() => createDefaultFilters());
   const [prefs, setPrefs] = useState<TeamPreferences>(() => loadTeamPreferences());
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [teamsOpen, setTeamsOpen] = useState(false);
 
   const highlightTeams = useMemo(() => {
     const s = new Set(prefs.interesting);
@@ -29,9 +30,8 @@ function App() {
     return filterEvents(data.events, withHighlight);
   }, [data, filters, highlightTeams]);
 
-  const activeFilterCount =
-    (filters.sports.size < 3 ? 1 : 0) + (filters.nhlTeams && filters.nhlTeams.size > 0 ? 1 : 0);
-
+  const teamFilterCount = filters.nhlTeams?.size ?? 0;
+  const nhlOn = filters.sports.has('nhl');
   const rangeLabel = formatRangeLabel(anchor, anchor, view);
 
   const handlePrefs = (p: TeamPreferences) => {
@@ -63,6 +63,7 @@ function App() {
           <h1>Playra</h1>
           <p className="tagline">MotoGP · F1 · NHL</p>
         </div>
+        <SportChips filters={filters} onChange={setFilters} />
         <div className="nav-controls">
           <div className="view-toggle" role="tablist" aria-label="Vy">
             <button
@@ -112,26 +113,32 @@ function App() {
         </section>
 
         <aside className="sidebar">
-          <button
-            type="button"
-            className="filters-toggle"
-            aria-expanded={filtersOpen}
-            onClick={() => setFiltersOpen((open) => !open)}
-          >
-            <span>Filter</span>
-            {activeFilterCount > 0 && <span className="filters-toggle__badge">{activeFilterCount}</span>}
-            <span className="filters-toggle__chevron" aria-hidden>
-              {filtersOpen ? '▴' : '▾'}
-            </span>
-          </button>
-          <div className={`sidebar__body ${filtersOpen ? 'is-open' : ''}`}>
-            <FilterBar
-              filters={filters}
-              onChange={setFilters}
-              teams={data.nhlTeams}
-              prefs={prefs}
-              onPrefsChange={handlePrefs}
-            />
+          {nhlOn && (
+            <>
+              <button
+                type="button"
+                className="filters-toggle"
+                aria-expanded={teamsOpen}
+                onClick={() => setTeamsOpen((open) => !open)}
+              >
+                <span>NHL-lag</span>
+                {teamFilterCount > 0 && <span className="filters-toggle__badge">{teamFilterCount}</span>}
+                <span className="filters-toggle__chevron" aria-hidden>
+                  {teamsOpen ? '▴' : '▾'}
+                </span>
+              </button>
+              <div className={`sidebar__body ${teamsOpen ? 'is-open' : ''}`}>
+                <FilterBar
+                  filters={filters}
+                  onChange={setFilters}
+                  teams={data.nhlTeams}
+                  prefs={prefs}
+                  onPrefsChange={handlePrefs}
+                />
+              </div>
+            </>
+          )}
+          <div className="sidebar__meta">
             <SourceBanner sources={data.sources} generatedAt={data.generatedAt} />
           </div>
         </aside>

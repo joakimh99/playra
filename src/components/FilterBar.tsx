@@ -1,6 +1,5 @@
-import { ALL_SPORTS, toggleNhlTeam, toggleSport } from '../lib/filters';
-import { SPORT_THEME } from '../lib/sportTheme';
-import type { FilterState, NhlTeam, Sport, TeamPreferences } from '../lib/types';
+import { toggleNhlTeam } from '../lib/filters';
+import type { FilterState, NhlTeam, TeamPreferences } from '../lib/types';
 
 interface Props {
   filters: FilterState;
@@ -12,100 +11,73 @@ interface Props {
 
 export function FilterBar({ filters, onChange, teams, prefs, onPrefsChange }: Props) {
   const nhlOn = filters.sports.has('nhl');
+  if (!nhlOn) return null;
 
   return (
     <div className="filter-bar">
       <fieldset className="filter-group">
-        <legend>Sporter</legend>
-        <div className="chip-row">
-          {ALL_SPORTS.map((sport: Sport) => {
-            const active = filters.sports.has(sport);
-            const theme = SPORT_THEME[sport];
+        <legend>NHL – lag</legend>
+        <p className="muted tiny">Klicka för filter · stjärna för intressant</p>
+        <div className="team-prefs">
+          <label>
+            Favoritlag
+            <select
+              value={prefs.favorite ?? ''}
+              onChange={(e) =>
+                onPrefsChange({
+                  ...prefs,
+                  favorite: e.target.value || undefined,
+                })
+              }
+            >
+              <option value="">—</option>
+              {teams.map((t) => (
+                <option key={t.abbrev} value={t.abbrev}>
+                  {t.name} ({t.abbrev})
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div className="team-grid">
+          {teams.map((t) => {
+            const inFilter = filters.nhlTeams?.has(t.abbrev) ?? false;
+            const interesting = prefs.interesting.includes(t.abbrev);
+            const isFav = prefs.favorite === t.abbrev;
             return (
-              <button
-                key={sport}
-                type="button"
-                className={`filter-chip ${active ? 'filter-chip--on' : ''}`}
-                aria-pressed={active}
-                onClick={() => onChange(toggleSport(filters, sport))}
-              >
-                <span
-                  className="filter-chip__dot"
-                  style={{ background: active ? theme.border : 'transparent', boxShadow: active ? undefined : `inset 0 0 0 1px ${theme.border}` }}
-                  aria-hidden
-                />
-                {theme.label}
-              </button>
+              <div key={t.abbrev} className="team-grid__item">
+                <button
+                  type="button"
+                  className={`team-btn ${inFilter ? 'team-btn--filter' : ''} ${interesting ? 'team-btn--interesting' : ''} ${isFav ? 'team-btn--fav' : ''}`}
+                  onClick={() => onChange(toggleNhlTeam(filters, t.abbrev))}
+                  title="Filtrera matcher"
+                >
+                  {t.abbrev}
+                </button>
+                <button
+                  type="button"
+                  className="team-star"
+                  aria-pressed={interesting}
+                  title="Markera som intressant"
+                  onClick={() => {
+                    const set = new Set(prefs.interesting);
+                    if (set.has(t.abbrev)) set.delete(t.abbrev);
+                    else set.add(t.abbrev);
+                    onPrefsChange({ ...prefs, interesting: [...set] });
+                  }}
+                >
+                  ★
+                </button>
+              </div>
             );
           })}
         </div>
+        {filters.nhlTeams && filters.nhlTeams.size > 0 && (
+          <button type="button" className="link-btn" onClick={() => onChange({ ...filters, nhlTeams: null })}>
+            Rensa lagfilter
+          </button>
+        )}
       </fieldset>
-
-      {nhlOn && (
-        <fieldset className="filter-group">
-          <legend>NHL – lagfilter</legend>
-          <p className="muted tiny">Klicka för filter · stjärna för intressant</p>
-          <div className="team-prefs">
-            <label>
-              Favoritlag
-              <select
-                value={prefs.favorite ?? ''}
-                onChange={(e) =>
-                  onPrefsChange({
-                    ...prefs,
-                    favorite: e.target.value || undefined,
-                  })
-                }
-              >
-                <option value="">—</option>
-                {teams.map((t) => (
-                  <option key={t.abbrev} value={t.abbrev}>
-                    {t.name} ({t.abbrev})
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-          <div className="team-grid">
-            {teams.map((t) => {
-              const inFilter = filters.nhlTeams?.has(t.abbrev) ?? false;
-              const interesting = prefs.interesting.includes(t.abbrev);
-              const isFav = prefs.favorite === t.abbrev;
-              return (
-                <div key={t.abbrev} className="team-grid__item">
-                  <button
-                    type="button"
-                    className={`team-btn ${inFilter ? 'team-btn--filter' : ''} ${interesting ? 'team-btn--interesting' : ''} ${isFav ? 'team-btn--fav' : ''}`}
-                    onClick={() => onChange(toggleNhlTeam(filters, t.abbrev))}
-                    title="Filtrera matcher"
-                  >
-                    {t.abbrev}
-                  </button>
-                  <button
-                    type="button"
-                    className="team-star"
-                    aria-pressed={interesting}
-                    title="Markera som intressant"
-                    onClick={() => {
-                      const set = new Set(prefs.interesting);
-                      if (set.has(t.abbrev)) set.delete(t.abbrev);
-                      else set.add(t.abbrev);
-                      onPrefsChange({ ...prefs, interesting: [...set] });
-                    }}
-                  >
-                    ★
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-          {filters.nhlTeams && filters.nhlTeams.size > 0 && (
-            <button type="button" className="link-btn" onClick={() => onChange({ ...filters, nhlTeams: null })}>
-              Rensa lagfilter
-            </button>
-          )}
-        </fieldset>
-      )}
     </div>
   );
 }
