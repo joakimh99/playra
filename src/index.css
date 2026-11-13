@@ -114,11 +114,135 @@ select:focus-visible {
   -webkit-backdrop-filter: blur(12px);
 }
 
+.brand-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
+  width: 100%;
+}
+
 .sport-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
   align-items: center;
+}
+
+/* Mobile-only NHL strip — hidden on desktop */
+.nhl-strip {
+  display: none;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.nhl-strip__top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nhl-strip__fav {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.nhl-strip__fav-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.nhl-strip__fav select {
+  min-width: 0;
+  flex: 1;
+  min-height: 36px;
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.nhl-strip__clear {
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  min-height: 36px;
+  font-size: 0.72rem;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.nhl-strip__scroll {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0.1rem 0 0.15rem;
+  touch-action: pan-x;
+}
+
+.nhl-strip__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.nhl-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 40px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 550;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  transition:
+    background 140ms var(--ease-out),
+    border-color 140ms var(--ease-out),
+    color 140ms var(--ease-out),
+    transform 140ms var(--ease-out);
+}
+
+.nhl-chip--on {
+  background: var(--accent-muted);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.nhl-chip--fav {
+  border-color: rgba(242, 201, 76, 0.45);
+}
+
+.nhl-chip--star .nhl-chip__star,
+.nhl-chip--fav .nhl-chip__star {
+  color: var(--highlight);
+  font-size: 0.62rem;
+}
+
+.nhl-chip:active {
+  transform: scale(0.97);
 }
 
 .sport-chip {
@@ -325,16 +449,12 @@ select:focus-visible {
   min-width: 0;
 }
 
-.filters-toggle {
-  display: none;
-}
-
-.sidebar__body {
-  display: block;
-}
-
 .sidebar__meta {
   margin-top: 0.5rem;
+}
+
+.sidebar__desktop-filters {
+  display: block;
 }
 
 /* ── Filters ── */
@@ -494,6 +614,7 @@ select:focus-visible {
 
 .week-view-mobile {
   display: none;
+  width: 100%;
 }
 
 .day-strip {
@@ -501,6 +622,7 @@ select:focus-visible {
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 0.3rem;
   margin-bottom: 0.75rem;
+  width: 100%;
 }
 
 .day-strip__day {
@@ -573,6 +695,7 @@ select:focus-visible {
 }
 
 .day-agenda {
+  width: 100%;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg-elevated);
@@ -956,23 +1079,31 @@ select:focus-visible {
 
 @media (max-width: 900px) {
   .app {
+    width: 100%;
+    max-width: none;
     padding:
-      0 max(0.85rem, env(safe-area-inset-right, 0px))
-      calc(1.5rem + env(safe-area-inset-bottom, 0px))
-      max(0.85rem, env(safe-area-inset-left, 0px));
+      0 max(0.75rem, env(safe-area-inset-right, 0px))
+      calc(1.25rem + env(safe-area-inset-bottom, 0px))
+      max(0.75rem, env(safe-area-inset-left, 0px));
   }
 
   .app-header {
-    gap: 0.55rem;
+    gap: 0.5rem;
     align-items: stretch;
     flex-direction: column;
+    width: 100%;
+  }
+
+  .brand-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
   }
 
   .brand {
     flex-direction: row;
     align-items: baseline;
     justify-content: space-between;
-    gap: 0.75rem;
   }
 
   .tagline {
@@ -988,6 +1119,7 @@ select:focus-visible {
 
   .sport-chip {
     justify-content: center;
+    width: 100%;
     min-height: 42px;
     padding: 0.45rem 0.4rem;
     font-size: 0.82rem;
@@ -1001,15 +1133,27 @@ select:focus-visible {
     display: inline;
   }
 
+  .nhl-strip {
+    display: flex;
+    width: 100%;
+  }
+
+  .nhl-strip__fav select {
+    font-size: 16px;
+    min-height: 40px;
+  }
+
   .nav-controls {
     width: 100%;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: stretch;
-    gap: 0.45rem;
+    gap: 0.4rem;
   }
 
   .view-toggle {
-    width: 100%;
+    flex: 1 1 auto;
+    min-width: 9rem;
   }
 
   .view-toggle button {
@@ -1019,6 +1163,7 @@ select:focus-visible {
   }
 
   .date-nav {
+    flex: 1 1 100%;
     width: 100%;
     gap: 0.35rem;
   }
@@ -1040,97 +1185,68 @@ select:focus-visible {
   .layout {
     display: flex;
     flex-direction: column;
+    width: 100%;
     min-height: 0;
   }
 
   .calendar-panel {
     order: 1;
-    padding: 0.75rem 0 0;
+    width: 100%;
+    align-self: stretch;
+    padding: 0.65rem 0 0;
     min-height: 0;
+    min-width: 0;
+  }
+
+  .calendar-panel > * {
+    max-width: 100%;
   }
 
   .sidebar {
     order: 2;
+    width: 100%;
     position: static;
     max-height: none;
     overflow: visible;
     border-right: none;
     border-top: 1px solid var(--border);
-    padding: 0.85rem 0 0;
-    margin-top: 0.75rem;
+    padding: 0.75rem 0 0;
+    margin-top: 0.65rem;
   }
 
-  .filters-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    width: 100%;
-    min-height: 44px;
-    padding: 0.55rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--accent-muted);
-    color: var(--text);
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 550;
-  }
-
-  .filters-toggle__badge {
-    margin-left: auto;
-    margin-right: 0.25rem;
-    min-width: 1.25rem;
-    height: 1.25rem;
-    padding: 0 0.35rem;
-    border-radius: 999px;
-    background: var(--accent);
-    color: #0a0a0b;
-    font-size: 0.7rem;
-    font-weight: 650;
-    display: inline-grid;
-    place-items: center;
-  }
-
-  .filters-toggle__chevron {
-    color: var(--text-tertiary);
-    font-size: 0.75rem;
-  }
-
-  .sidebar__body {
+  .sidebar__desktop-filters {
     display: none;
-    padding-top: 0.85rem;
   }
 
-  .sidebar__body.is-open {
-    display: block;
-  }
-
-  .team-btn {
-    min-height: 36px;
-    font-size: 0.72rem;
-  }
-
-  .team-star {
-    min-width: 28px;
-    min-height: 36px;
-  }
-
-  .team-grid {
-    max-height: 180px;
-  }
-
-  /* Week: day strip + agenda */
+  /* Week: day strip + agenda — full width */
   .week-view--desktop {
     display: none;
   }
 
   .week-view-mobile {
     display: block;
+    width: 100%;
+  }
+
+  .day-strip {
+    width: 100%;
+    gap: 0.25rem;
+  }
+
+  .day-strip__day {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .day-agenda,
+  .day-agenda__list,
+  .event-chip {
+    width: 100%;
   }
 
   .event-chip {
-    padding: 0.55rem 0.6rem;
+    box-sizing: border-box;
+    padding: 0.6rem 0.7rem;
     font-size: 0.82rem;
     gap: 0.12rem;
   }
@@ -1140,14 +1256,23 @@ select:focus-visible {
   }
 
   .event-chip__title {
-    font-size: 0.9rem;
+    font-size: 0.92rem;
   }
 
   .event-chip__sport {
     font-size: 0.62rem;
   }
 
-  /* Month: compact grid + agenda under */
+  /* Month: full-width grid + agenda */
+  .month-view {
+    width: 100%;
+  }
+
+  .month-view__weekdays,
+  .month-view__grid {
+    width: 100%;
+  }
+
   .month-view__weekdays {
     font-size: 0.6rem;
     padding: 0.45rem 0;
@@ -1184,6 +1309,7 @@ select:focus-visible {
 
   .month-view__agenda {
     display: block;
+    width: 100%;
   }
 }
 

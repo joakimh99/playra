@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FilterBar } from './components/FilterBar';
 import { MonthView } from './components/MonthView';
+import { NhlTeamStrip } from './components/NhlTeamStrip';
 import { SourceBanner } from './components/SourceBanner';
 import { SportChips } from './components/SportChips';
 import { WeekView } from './components/WeekView';
@@ -16,7 +17,6 @@ function App() {
   const [anchor, setAnchor] = useState(() => zonedNow());
   const [filters, setFilters] = useState<FilterState>(() => createDefaultFilters());
   const [prefs, setPrefs] = useState<TeamPreferences>(() => loadTeamPreferences());
-  const [teamsOpen, setTeamsOpen] = useState(false);
 
   const highlightTeams = useMemo(() => {
     const s = new Set(prefs.interesting);
@@ -30,7 +30,6 @@ function App() {
     return filterEvents(data.events, withHighlight);
   }, [data, filters, highlightTeams]);
 
-  const teamFilterCount = filters.nhlTeams?.size ?? 0;
   const nhlOn = filters.sports.has('nhl');
   const rangeLabel = formatRangeLabel(anchor, anchor, view);
 
@@ -59,11 +58,24 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <div className="brand">
-          <h1>Playra</h1>
-          <p className="tagline">MotoGP · F1 · NHL</p>
+        <div className="brand-row">
+          <div className="brand">
+            <h1>Playra</h1>
+            <p className="tagline">MotoGP · F1 · NHL</p>
+          </div>
+          <SportChips filters={filters} onChange={setFilters} />
         </div>
-        <SportChips filters={filters} onChange={setFilters} />
+
+        {nhlOn && (
+          <NhlTeamStrip
+            filters={filters}
+            onChange={setFilters}
+            teams={data.nhlTeams}
+            prefs={prefs}
+            onPrefsChange={handlePrefs}
+          />
+        )}
+
         <div className="nav-controls">
           <div className="view-toggle" role="tablist" aria-label="Vy">
             <button
@@ -113,31 +125,17 @@ function App() {
         </section>
 
         <aside className="sidebar">
-          {nhlOn && (
-            <>
-              <button
-                type="button"
-                className="filters-toggle"
-                aria-expanded={teamsOpen}
-                onClick={() => setTeamsOpen((open) => !open)}
-              >
-                <span>NHL-lag</span>
-                {teamFilterCount > 0 && <span className="filters-toggle__badge">{teamFilterCount}</span>}
-                <span className="filters-toggle__chevron" aria-hidden>
-                  {teamsOpen ? '▴' : '▾'}
-                </span>
-              </button>
-              <div className={`sidebar__body ${teamsOpen ? 'is-open' : ''}`}>
-                <FilterBar
-                  filters={filters}
-                  onChange={setFilters}
-                  teams={data.nhlTeams}
-                  prefs={prefs}
-                  onPrefsChange={handlePrefs}
-                />
-              </div>
-            </>
-          )}
+          <div className="sidebar__desktop-filters">
+            {nhlOn && (
+              <FilterBar
+                filters={filters}
+                onChange={setFilters}
+                teams={data.nhlTeams}
+                prefs={prefs}
+                onPrefsChange={handlePrefs}
+              />
+            )}
+          </div>
           <div className="sidebar__meta">
             <SourceBanner sources={data.sources} generatedAt={data.generatedAt} />
           </div>
