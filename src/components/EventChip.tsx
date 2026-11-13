@@ -16,12 +16,15 @@ export function EventChip({ event, highlighted, compact }: Props) {
       style={{ borderLeftColor: theme.border, background: theme.bg }}
       title={`${event.title} – ${event.subtitle}`}
     >
-      <span className="event-chip__time">{formatEventTime(event.start)}</span>
+      <div className="event-chip__row">
+        <span className="event-chip__time">{formatEventTime(event.start)}</span>
+        {!compact && (
+          <span className="event-chip__sport" style={{ color: theme.color }}>
+            {theme.label}
+          </span>
+        )}
+      </div>
       <span className="event-chip__title">{event.title}</span>
-      {!compact && <span className="event-chip__subtitle">{event.subtitle}</span>}
-      <span className="event-chip__sport" style={{ color: theme.color }}>
-        {theme.label}
-      </span>
     </article>
   );
 }

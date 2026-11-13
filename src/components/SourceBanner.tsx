@@ -10,21 +10,32 @@ interface Props {
 
 export function SourceBanner({ sources, generatedAt }: Props) {
   const updated = formatInTimeZone(generatedAt, DISPLAY_TZ, "d MMM yyyy HH:mm", { locale: sv });
+  const notes = sources.flatMap((s) =>
+    [...s.limitations, ...(s.note ? [s.note] : [])].map((note) => ({
+      sport: s.sport,
+      note,
+    })),
+  );
+
   return (
     <aside className="source-banner">
       <p className="tiny muted">
-        Data hämtad {updated} ({DISPLAY_TZ}). Källor:{' '}
+        Uppdaterad {updated}
+        <br />
         {sources.map((s) => s.source).join(' · ')}
       </p>
-      <ul className="source-banner__notes">
-        {sources.flatMap((s) =>
-          [...s.limitations, ...(s.note ? [s.note] : [])].map((note) => (
-            <li key={`${s.sport}-${note}`}>
-              <strong>{s.sport.toUpperCase()}:</strong> {note}
-            </li>
-          )),
-        )}
-      </ul>
+      {notes.length > 0 && (
+        <details className="source-banner__details">
+          <summary>Datakällor &amp; begränsningar</summary>
+          <ul className="source-banner__notes">
+            {notes.map(({ sport, note }) => (
+              <li key={`${sport}-${note}`}>
+                <strong>{sport.toUpperCase()}:</strong> {note}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
     </aside>
   );
 }

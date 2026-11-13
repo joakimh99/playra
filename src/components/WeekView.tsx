@@ -29,7 +29,7 @@ export function WeekView({ anchor, events, highlightTeams }: Props) {
             </header>
             <div className="week-day__events">
               {dayEvents.length === 0 ? (
-                <p className="muted tiny">Inget</p>
+                <p className="week-day__empty">—</p>
               ) : (
                 dayEvents.map((ev) => (
                   <EventChip

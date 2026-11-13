@@ -27,9 +27,13 @@ export function FilterBar({ filters, onChange, teams, prefs, onPrefsChange }: Pr
                 type="button"
                 className={`filter-chip ${active ? 'filter-chip--on' : ''}`}
                 aria-pressed={active}
-                style={active ? { borderColor: theme.border, color: theme.color } : undefined}
                 onClick={() => onChange(toggleSport(filters, sport))}
               >
+                <span
+                  className="filter-chip__dot"
+                  style={{ background: active ? theme.border : 'transparent', boxShadow: active ? undefined : `inset 0 0 0 1px ${theme.border}` }}
+                  aria-hidden
+                />
                 {theme.label}
               </button>
             );
@@ -40,9 +44,7 @@ export function FilterBar({ filters, onChange, teams, prefs, onPrefsChange }: Pr
       {nhlOn && (
         <fieldset className="filter-group">
           <legend>NHL – lagfilter</legend>
-          <p className="muted tiny">
-            Välj lag för att visa endast deras matcher. Favorit och intressanta lag sparas lokalt.
-          </p>
+          <p className="muted tiny">Klicka för filter · stjärna för intressant</p>
           <div className="team-prefs">
             <label>
               Favoritlag

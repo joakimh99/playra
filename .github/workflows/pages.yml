@@ -3,6 +3,9 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '0 5,13,21 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: read

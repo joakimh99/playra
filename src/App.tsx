@@ -55,9 +55,9 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <div>
+        <div className="brand">
           <h1>Playra</h1>
-          <p className="tagline">MotoGP · Formel 1 · NHL i en kalender</p>
+          <p className="tagline">MotoGP · F1 · NHL</p>
         </div>
         <div className="nav-controls">
           <div className="view-toggle" role="tablist" aria-label="Vy">
@@ -112,8 +112,8 @@ function App() {
           ) : (
             <MonthView anchor={anchor} events={filteredEvents} highlightTeams={highlightTeams} />
           )}
-          <p className="muted tiny foot">
-            Visar {filteredEvents.length} händelser efter filter. Tider i Europe/Stockholm.
+          <p className="foot">
+            {filteredEvents.length} händelser · Europe/Stockholm
           </p>
         </section>
       </main>
