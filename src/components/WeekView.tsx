@@ -22,22 +22,26 @@ function pickDefaultDay(days: Date[], events: CalendarEvent[]): Date {
 }
 
 export function WeekView({ anchor, events, highlightTeams }: Props) {
-  const { start } = weekBounds(anchor);
-  const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(start, i)), [start]);
+  const weekKey = format(weekBounds(anchor).start, 'yyyy-MM-dd');
+  const days = useMemo(() => {
+    const { start } = weekBounds(anchor);
+    return Array.from({ length: 7 }, (_, i) => addDays(start, i));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- weekKey is the stable week identity
+  }, [weekKey]);
+
   const today = zonedNow();
   const [selected, setSelected] = useState(() => pickDefaultDay(days, events));
 
   useEffect(() => {
     setSelected(pickDefaultDay(days, events));
-    // Reset when the visible week changes, not on every filter tweak.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally keyed to week start
-  }, [start]);
+    // Only reset selection when the week changes — not on every render/filter.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weekKey]);
 
   const selectedEvents = events.filter((e) => eventOnLocalDay(e.start, selected));
 
   return (
     <>
-      {/* Desktop: 7 columns */}
       <div className="week-view week-view--desktop">
         {days.map((day) => {
           const dayEvents = events.filter((e) => eventOnLocalDay(e.start, day));
@@ -66,7 +70,6 @@ export function WeekView({ anchor, events, highlightTeams }: Props) {
         })}
       </div>
 
-      {/* Mobile: day strip + agenda */}
       <div className="week-view-mobile">
         <div className="day-strip" role="tablist" aria-label="Veckodagar">
           {days.map((day) => {

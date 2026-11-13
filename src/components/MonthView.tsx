@@ -28,14 +28,16 @@ function startOfPreferred(anchor: Date, days: Date[]): Date {
 }
 
 export function MonthView({ anchor, events, highlightTeams }: Props) {
-  const days = useMemo(() => monthGridDays(anchor), [anchor]);
+  const monthKey = format(anchor, 'yyyy-MM');
+  const days = useMemo(() => monthGridDays(anchor), [monthKey, anchor]);
   const today = zonedNow();
   const [selected, setSelected] = useState(() => pickDefaultDay(anchor, days, events));
 
   useEffect(() => {
     setSelected(pickDefaultDay(anchor, days, events));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally keyed to month
-  }, [anchor]);
+    // Only reset when the month changes — not on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [monthKey]);
 
   const selectedEvents = events.filter((e) => eventOnLocalDay(e.start, selected));
 
