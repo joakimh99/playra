@@ -15,6 +15,7 @@ function App() {
   const [anchor, setAnchor] = useState(() => zonedNow());
   const [filters, setFilters] = useState<FilterState>(() => createDefaultFilters());
   const [prefs, setPrefs] = useState<TeamPreferences>(() => loadTeamPreferences());
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const highlightTeams = useMemo(() => {
     const s = new Set(prefs.interesting);
@@ -27,6 +28,9 @@ function App() {
     const withHighlight = { ...filters, highlightTeams };
     return filterEvents(data.events, withHighlight);
   }, [data, filters, highlightTeams]);
+
+  const activeFilterCount =
+    (filters.sports.size < 3 ? 1 : 0) + (filters.nhlTeams && filters.nhlTeams.size > 0 ? 1 : 0);
 
   const rangeLabel = formatRangeLabel(anchor, anchor, view);
 
@@ -96,16 +100,6 @@ function App() {
       </header>
 
       <main className="layout">
-        <aside className="sidebar">
-          <FilterBar
-            filters={filters}
-            onChange={setFilters}
-            teams={data.nhlTeams}
-            prefs={prefs}
-            onPrefsChange={handlePrefs}
-          />
-          <SourceBanner sources={data.sources} generatedAt={data.generatedAt} />
-        </aside>
         <section className="calendar-panel" aria-label="Kalender">
           {view === 'week' ? (
             <WeekView anchor={anchor} events={filteredEvents} highlightTeams={highlightTeams} />
@@ -116,6 +110,31 @@ function App() {
             {filteredEvents.length} händelser · Europe/Stockholm
           </p>
         </section>
+
+        <aside className="sidebar">
+          <button
+            type="button"
+            className="filters-toggle"
+            aria-expanded={filtersOpen}
+            onClick={() => setFiltersOpen((open) => !open)}
+          >
+            <span>Filter</span>
+            {activeFilterCount > 0 && <span className="filters-toggle__badge">{activeFilterCount}</span>}
+            <span className="filters-toggle__chevron" aria-hidden>
+              {filtersOpen ? '▴' : '▾'}
+            </span>
+          </button>
+          <div className={`sidebar__body ${filtersOpen ? 'is-open' : ''}`}>
+            <FilterBar
+              filters={filters}
+              onChange={setFilters}
+              teams={data.nhlTeams}
+              prefs={prefs}
+              onPrefsChange={handlePrefs}
+            />
+            <SourceBanner sources={data.sources} generatedAt={data.generatedAt} />
+          </div>
+        </aside>
       </main>
     </div>
   );

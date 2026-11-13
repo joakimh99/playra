@@ -4,6 +4,7 @@ import type { CalendarEvent } from '../lib/types';
 import { eventOnLocalDay, monthGridDays } from '../lib/dates';
 import { EventChip } from './EventChip';
 import { isEventHighlighted } from '../lib/filters';
+import { SPORT_THEME } from '../lib/sportTheme';
 
 interface Props {
   anchor: Date;
@@ -27,6 +28,7 @@ export function MonthView({ anchor, events, highlightTeams }: Props) {
           const inMonth = isSameMonth(day, anchor);
           const dayEvents = events.filter((e) => eventOnLocalDay(e.start, day));
           const isToday = isSameDay(day, today);
+          const sports = [...new Set(dayEvents.map((e) => e.sport))];
           return (
             <section
               key={day.toISOString()}
@@ -35,6 +37,18 @@ export function MonthView({ anchor, events, highlightTeams }: Props) {
               <header className="month-cell__head">
                 {format(day, 'd', { locale: sv })}
               </header>
+              <div className="month-cell__dots" aria-hidden={dayEvents.length === 0}>
+                {sports.slice(0, 3).map((sport) => (
+                  <span
+                    key={sport}
+                    className="month-cell__dot"
+                    style={{ background: SPORT_THEME[sport].border }}
+                  />
+                ))}
+                {dayEvents.length > 0 && (
+                  <span className="month-cell__count">{dayEvents.length}</span>
+                )}
+              </div>
               <div className="month-cell__events">
                 {dayEvents.slice(0, 4).map((ev) => (
                   <EventChip
